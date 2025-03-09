@@ -2,8 +2,12 @@ let brushSizeSlider;
 let colorPicker;
 let clearButton;
 let shapeSelect;
+let strokeSelect;
+let modeSelect;
 let currentShape = 'circle';
 let drawingColor;
+let hasStroke = false;
+let drawingMode = 'normal';
 
 function setup() {
     let canvas = createCanvas(600, 400);
@@ -28,6 +32,22 @@ function setup() {
     shapeSelect.option('triangle');
     shapeSelect.changed(updateShape);
     
+    createP('Stroke:').parent('controls');
+    strokeSelect = createSelect();
+    strokeSelect.parent('controls');
+    strokeSelect.option('no stroke');
+    strokeSelect.option('thin stroke');
+    strokeSelect.option('thick stroke');
+    strokeSelect.changed(updateStroke);
+    
+    createP('Drawing Mode:').parent('controls');
+    modeSelect = createSelect();
+    modeSelect.parent('controls');
+    modeSelect.option('normal');
+    modeSelect.option('eraser');
+    modeSelect.option('rainbow');
+    modeSelect.changed(updateMode);
+    
     clearButton = createButton('Clear Canvas');
     clearButton.parent('controls');
     clearButton.mousePressed(clearCanvas);
@@ -44,8 +64,29 @@ function draw() {
 
 function drawShape(x, y) {
     let size = brushSizeSlider.value();
-    fill(drawingColor);
-    noStroke();
+    
+    if (drawingMode === 'eraser') {
+        fill(255);
+        noStroke();
+    } else if (drawingMode === 'rainbow') {
+        fill(random(255), random(255), random(255));
+    } else {
+        fill(drawingColor);
+    }
+    
+    switch(strokeSelect.value()) {
+        case 'no stroke':
+            noStroke();
+            break;
+        case 'thin stroke':
+            stroke(0);
+            strokeWeight(1);
+            break;
+        case 'thick stroke':
+            stroke(0);
+            strokeWeight(3);
+            break;
+    }
     
     switch(currentShape) {
         case 'circle':
@@ -71,6 +112,14 @@ function updateColor() {
 
 function updateShape() {
     currentShape = shapeSelect.value();
+}
+
+function updateStroke() {
+    hasStroke = strokeSelect.value() !== 'no stroke';
+}
+
+function updateMode() {
+    drawingMode = modeSelect.value();
 }
 
 function clearCanvas() {
